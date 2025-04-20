@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #eaeaea; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .register-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; }
+        label { display: block; margin-top: 10px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin-top: 20px; width: 100%; padding: 10px; background: #6c63ff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #4b43e6; }
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <h2>Admin Registration</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Full Name:</label>
+        <input type="text" name="full_name" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Password:</label>
+        <input type="password" name="password1" required>
+
+        <label>Confirm Password:</label>
+        <input type="password" name="password2" required>
+
+        <label>Verification Code:</label>
+        <input type="text" name="verification_code" required>
+
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+</body>
+</html>
