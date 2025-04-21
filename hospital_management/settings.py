@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -73,21 +76,19 @@ WSGI_APPLICATION = 'hospital_management.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+load_dotenv()
+tmpPostgres = urlparse('postgresql://neondb_owner:npg_dgEXFOCB2v3M@ep-silent-salad-a56fhqm0-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',  # from your string
-        'USER': 'neondb_owner',  # from your string
-        'PASSWORD': 'npg_t6IO5ALenYNd',  # from your string
-        'HOST': 'ep-withered-mode-a49hz112-pooler.us-east-1.aws.neon.tech',  # from your string
-        'PORT': '5432',  # PostgreSQL default
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
@@ -47,6 +48,3 @@ class AdminProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20)
     verification_code = models.CharField(max_length=20)
-from django.db import models
-
-# Create your models here.

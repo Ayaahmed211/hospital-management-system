@@ -14,6 +14,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome, {user.username}!')
+        
             return redirect('/')  # Redirect to dashboard later!
         else:
             messages.error(request, 'Invalid credentials.')
