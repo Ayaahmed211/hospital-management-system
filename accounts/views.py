@@ -1,22 +1,20 @@
-from django.shortcuts import render, redirect ,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import CustomUser,PatientProfile, DoctorProfile, AdminProfile
 from django.contrib.auth import authenticate, login
+from django.db import transaction
+from .models import CustomUser, PatientProfile, DoctorProfile, AdminProfile
 from .forms import PatientProfileForm, DoctorProfileForm, AdminProfileForm
 from django.contrib.auth.decorators import login_required
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        role = request.POST.get('role')  # Optional: if you want to use it later
-
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if user:
             login(request, user)
             messages.success(request, f'Welcome, {user.username}!')
-
-            # Redirect by user type
             if user.user_type == 'patient':
                 return redirect('patient_profile')
             elif user.user_type == 'doctor':
@@ -24,28 +22,30 @@ def login_view(request):
             elif user.user_type == 'admin':
                 return redirect('admin_profile')
             else:
-                return redirect('/')  # fallback
+                return redirect('/')
         else:
             messages.error(request, 'Invalid credentials.')
-
     return render(request, 'accounts/login.html')
 
+@transaction.atomic
 def register_patient(request):
     if request.method == 'POST':
-        full_name = request.POST['full_name']
-        email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        dob = request.POST['date_of_birth']
-        gender = request.POST['gender']
-        phone = request.POST['phone_number']
-        address = request.POST['address']
-        emergency = request.POST['emergency_contact']
+        full_name = request.POST.get('full_name', '')
+        email = request.POST.get('email', '')
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+        dob = request.POST.get('date_of_birth', '')
+        gender = request.POST.get('gender', '')
+        phone = request.POST.get('phone_number', '')
+        address = request.POST.get('address', '')
+        emergency = request.POST.get('emergency_contact', '')
         insurance = request.POST.get('insurance_details', '')
         history = request.POST.get('medical_history', '')
 
         if password1 != password2:
             messages.error(request, 'Passwords do not match!')
+        elif not all([full_name, email, dob, gender, phone, address, emergency]):
+            messages.error(request, 'Please fill in all required fields.')
         else:
             user = CustomUser.objects.create_user(
                 username=email,
@@ -69,8 +69,7 @@ def register_patient(request):
 
     return render(request, 'accounts/register_patient.html')
 
-    return render(request, 'accounts/register_patient.html')
-
+@transaction.atomic
 def register_doctor(request):
     if request.method == 'POST':
         full_name = request.POST['full_name']
@@ -105,9 +104,9 @@ def register_doctor(request):
             )
             messages.success(request, 'Doctor account created successfully!')
             return redirect('login')
-
     return render(request, 'accounts/register_doctor.html')
 
+@transaction.atomic
 def register_admin(request):
     if request.method == 'POST':
         full_name = request.POST['full_name']
@@ -137,7 +136,6 @@ def register_admin(request):
             )
             messages.success(request, 'Admin account created successfully!')
             return redirect('login')
-
     return render(request, 'accounts/register_admin.html')
 
 @login_required
@@ -154,7 +152,6 @@ def patient_profile(request):
 
     return render(request, 'accounts/patient_profile.html', {'form': form})
 
-
 @login_required
 def doctor_profile(request):
     profile, created = DoctorProfile.objects.get_or_create(user=request.user)
@@ -168,7 +165,6 @@ def doctor_profile(request):
         form = DoctorProfileForm(instance=profile)
 
     return render(request, 'accounts/doctor_profile.html', {'form': form})
-
 
 @login_required
 def admin_profile(request):

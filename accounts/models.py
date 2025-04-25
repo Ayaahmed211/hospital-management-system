@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
@@ -24,13 +25,14 @@ class CustomUser(AbstractUser):
 
 class PatientProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10)
-    phone_number = models.CharField(max_length=20)
-    address = models.TextField()
-    emergency_contact = models.CharField(max_length=20)
+    date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    emergency_contact = models.CharField(max_length=20, blank=True)
     insurance_details = models.CharField(max_length=255, blank=True, null=True)
     medical_history = models.TextField(blank=True, null=True)
+
 
 
 class DoctorProfile(models.Model):
@@ -47,6 +49,5 @@ class AdminProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20)
     verification_code = models.CharField(max_length=20)
-from django.db import models
 
 # Create your models here.
