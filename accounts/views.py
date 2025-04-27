@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.db import transaction
 from .models import CustomUser, PatientProfile, DoctorProfile, AdminProfile
-from .forms import PatientProfileForm, DoctorProfileForm, AdminProfileForm
+from .forms import PatientProfileForm, DoctorProfileForm, AdminProfileForm, CustomUserForm
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 
 def login_view(request):
     if request.method == 'POST':
@@ -28,115 +29,70 @@ def login_view(request):
     return render(request, 'accounts/login.html')
 
 @transaction.atomic
-def register_patient(request):
+def register(request):
     if request.method == 'POST':
-        full_name = request.POST.get('full_name', '')
-        email = request.POST.get('email', '')
-        password1 = request.POST.get('password1', '')
-        password2 = request.POST.get('password2', '')
-        dob = request.POST.get('date_of_birth', '')
-        gender = request.POST.get('gender', '')
-        phone = request.POST.get('phone_number', '')
-        address = request.POST.get('address', '')
-        emergency = request.POST.get('emergency_contact', '')
-        insurance = request.POST.get('insurance_details', '')
-        history = request.POST.get('medical_history', '')
-
-        if password1 != password2:
-            messages.error(request, 'Passwords do not match!')
-        elif not all([full_name, email, dob, gender, phone, address, emergency]):
-            messages.error(request, 'Please fill in all required fields.')
-        else:
-            user = CustomUser.objects.create_user(
-                username=email,
-                email=email,
-                password=password1,
-                first_name=full_name,
-                user_type='patient'
-            )
-            PatientProfile.objects.create(
-                user=user,
-                date_of_birth=dob,
-                gender=gender,
-                phone_number=phone,
-                address=address,
-                emergency_contact=emergency,
-                insurance_details=insurance,
-                medical_history=history
-            )
-            messages.success(request, 'Patient account created successfully!')
-            return redirect('login')
-
-    return render(request, 'accounts/register_patient.html')
-
-@transaction.atomic
-def register_doctor(request):
-    if request.method == 'POST':
-        full_name = request.POST['full_name']
-        email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        phone = request.POST['phone_number']
-        department = request.POST['department']
-        qualification = request.POST['qualification']
-        license_num = request.POST['license_number']
-        experience = request.POST['experience_years']
-        cert_doc = request.FILES.get('certification_document')
-
-        if password1 != password2:
-            messages.error(request, 'Passwords do not match!')
-        else:
-            user = CustomUser.objects.create_user(
-                username=email,
-                email=email,
-                password=password1,
-                first_name=full_name,
-                user_type='doctor'
-            )
-            DoctorProfile.objects.create(
-                user=user,
-                phone_number=phone,
-                department=department,
-                qualification=qualification,
-                license_number=license_num,
-                experience_years=experience,
-                certification_document=cert_doc
-            )
-            messages.success(request, 'Doctor account created successfully!')
-            return redirect('login')
-    return render(request, 'accounts/register_doctor.html')
-
-@transaction.atomic
-def register_admin(request):
-    if request.method == 'POST':
-        full_name = request.POST['full_name']
-        email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        phone = request.POST['phone_number']
-        verification_code = request.POST['verification_code']
-
-        if verification_code != "ADMIN123":
-            messages.error(request, 'Invalid verification code!')
-        elif password1 != password2:
-            messages.error(request, 'Passwords do not match!')
-        else:
-            user = CustomUser.objects.create_user(
-                username=email,
-                email=email,
-                password=password1,
-                first_name=full_name,
-                user_type='admin',
-                is_staff=True
-            )
-            AdminProfile.objects.create(
-                user=user,
-                phone_number=phone,
-                verification_code=verification_code
-            )
-            messages.success(request, 'Admin account created successfully!')
-            return redirect('login')
-    return render(request, 'accounts/register_admin.html')
+        user_form = CustomUserForm(request.POST)
+        
+        user_type = request.POST.get('user_type')
+        
+        try:
+            with transaction.atomic():
+                if user_form.is_valid():
+                    user = user_form.save(commit=False)
+                    user.set_password(user_form.cleaned_data['password1'])
+                    user.user_type = user_type
+                    user.save()
+                    
+                    if user_type == 'patient':
+                        PatientProfile.objects.create(
+                            user=user,
+                            date_of_birth=request.POST.get('date_of_birth'),
+                            gender=request.POST.get('gender'),
+                            phone_number=request.POST.get('phone_number'),
+                            address=request.POST.get('address'),
+                            emergency_contact=request.POST.get('emergency_contact'),
+                            insurance_details=request.POST.get('insurance_details'),
+                            medical_history=request.POST.get('medical_history')
+                        )
+                    elif user_type == 'doctor':
+                        certification_file = request.FILES.get('certification_document')
+                        if certification_file:
+                            fs = FileSystemStorage()
+                            filename = fs.save(f'certifications/{certification_file.name}', certification_file)
+                        
+                        DoctorProfile.objects.create(
+                            user=user,
+                            phone_number=request.POST.get('phone_number'),
+                            department=request.POST.get('department'),
+                            qualification=request.POST.get('qualification'),
+                            license_number=request.POST.get('license_number'),
+                            experience_years=request.POST.get('experience_years'),
+                            certification_document=filename if certification_file else None
+                        )
+                    elif user_type == 'admin':
+                        AdminProfile.objects.create(
+                            user=user,
+                            phone_number=request.POST.get('phone_number'),
+                            verification_code=request.POST.get('verification_code')
+                        )
+                    
+                    messages.success(request, 'Registration successful! Please log in.')
+                    return redirect('login')
+                
+                for field, errors in user_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+        
+        except Exception as e:
+            messages.error(request, f"An error occurred during registration: {str(e)}")
+            return redirect('register')
+    
+    else:
+        user_form = CustomUserForm()
+    
+    return render(request, 'accounts/register.html', {
+        'user_form': user_form
+    })
 
 @login_required
 def patient_profile(request):

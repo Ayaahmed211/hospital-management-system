@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 40px;
+        }
+
+        .registration-card {
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+
+        .role-fields {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card registration-card">
+                    <div class="card-header">
+                        <h2>Create Your Account</h2>
+                        <p class="mb-0">Select your role to continue</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        <form method="post" action="{% url 'register' %}" enctype="multipart/form-data"
+                            id="registrationForm">
+                            {% csrf_token %}
+
+                            <!-- Basic Information Section -->
+                            <div class="form-section">
+                                <h4 class="mb-4">Basic Information</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="id_username" class="form-label required-field">Username</label>
+                                        <input type="text" name="username" class="form-control" id="id_username"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="id_email" class="form-label required-field">Email</label>
+                                        <input type="email" name="email" class="form-control" id="id_email" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="id_password1" class="form-label required-field">Password</label>
+                                        <input type="password" name="password1" class="form-control" id="id_password1"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="id_password2" class="form-label required-field">Confirm
+                                            Password</label>
+                                        <input type="password" name="password2" class="form-control" id="id_password2"
+                                            required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="id_user_type" class="form-label required-field">Register As</label>
+                                        <select name="user_type" class="form-select" id="id_user_type" required>
+                                            <option value="">Select your role</option>
+                                            <option value="patient">Patient</option>
+                                            <option value="doctor">Doctor</option>
+                                            <option value="admin">Administrator</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Patient Fields -->
+                            <div id="patient-fields" class="form-section role-fields">
+                                <h4 class="mb-4">Patient Details</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="patient_date_of_birth" class="form-label">Date of Birth</label>
+                                        <input type="date" name="date_of_birth" class="form-control"
+                                            id="patient_date_of_birth">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="patient_gender" class="form-label">Gender</label>
+                                        <select name="gender" class="form-select" id="patient_gender">
+                                            <option value="">Select gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="patient_phone_number" class="form-label">Phone Number</label>
+                                        <input type="text" name="phone_number" class="form-control"
+                                            id="patient_phone_number" pattern="\d{10}" placeholder="10 digits">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="patient_emergency_contact" class="form-label">Emergency
+                                            Contact</label>
+                                        <input type="text" name="emergency_contact" class="form-control"
+                                            id="patient_emergency_contact">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="patient_address" class="form-label">Address</label>
+                                        <textarea name="address" class="form-control" id="patient_address"
+                                            rows="2"></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="patient_insurance_details" class="form-label">Insurance
+                                            Details</label>
+                                        <input type="text" name="insurance_details" class="form-control"
+                                            id="patient_insurance_details">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="patient_medical_history" class="form-label">Medical History</label>
+                                        <textarea name="medical_history" class="form-control"
+                                            id="patient_medical_history" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Doctor Fields -->
+                            <div id="doctor-fields" class="form-section role-fields">
+                                <h4 class="mb-4">Professional Information</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="doctor_phone_number" class="form-label required-field">Phone
+                                            Number</label>
+                                        <input type="text" name="phone_number" class="form-control"
+                                            id="doctor_phone_number" data-required pattern="\d{10}"
+                                            placeholder="10 digits">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doctor_department"
+                                            class="form-label required-field">Department</label>
+                                        <input type="text" name="department" class="form-control" id="doctor_department"
+                                            data-required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doctor_qualification"
+                                            class="form-label required-field">Qualification</label>
+                                        <input type="text" name="qualification" class="form-control"
+                                            id="doctor_qualification" data-required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doctor_license_number" class="form-label required-field">License
+                                            Number</label>
+                                        <input type="text" name="license_number" class="form-control"
+                                            id="doctor_license_number" data-required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doctor_experience_years"
+                                            class="form-label required-field">Experience (Years)</label>
+                                        <input type="number" name="experience_years" class="form-control"
+                                            id="doctor_experience_years" data-required min="0">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doctor_certification_document"
+                                            class="form-label required-field">Certification Document</label>
+                                        <input type="file" name="certification_document" class="form-control"
+                                            id="doctor_certification_document" data-required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Admin Fields -->
+                            <div id="admin-fields" class="form-section role-fields">
+                                <h4 class="mb-4">Administrator Details</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="admin_phone_number" class="form-label required-field">Phone
+                                            Number</label>
+                                        <input type="text" name="phone_number" class="form-control"
+                                            id="admin_phone_number" data-required pattern="\d{10}"
+                                            placeholder="10 digits">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="admin_verification_code"
+                                            class="form-label required-field">Verification Code</label>
+                                        <input type="text" name="verification_code" class="form-control"
+                                            id="admin_verification_code" data-required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg py-3">Create Account</button>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleSelect = document.getElementById('id_user_type');
+            const form = document.getElementById('registrationForm');
+
+            function updateRoleFields() {
+                // Hide all role fields and remove required attribute
+                document.querySelectorAll('.role-fields').forEach(section => {
+                    section.style.display = 'none';
+                    section.querySelectorAll('[data-required]').forEach(field => {
+                        field.required = false;
+                    });
+                });
+
+                // Show selected role's fields and set required
+                const selectedRole = roleSelect.value;
+                if (selectedRole) {
+                    const selectedSection = document.getElementById(`${selectedRole}-fields`);
+                    if (selectedSection) {
+                        selectedSection.style.display = 'block';
+                        selectedSection.querySelectorAll('[data-required]').forEach(field => {
+                            field.required = true;
+                        });
+                    }
+                }
+            }
+
+            updateRoleFields();
+            roleSelect.addEventListener('change', updateRoleFields);
+
+            form.addEventListener('submit', function (e) {
+                const selectedRole = roleSelect.value;
+                if (!selectedRole) {
+                    alert('Please select a role');
+                    e.preventDefault();
+                    return;
+                }
+
+                // Validate only visible required fields
+                const visibleSection = document.getElementById(`${selectedRole}-fields`);
+                if (visibleSection) {
+                    const invalidFields = [];
+                    visibleSection.querySelectorAll('[data-required]').forEach(field => {
+                        if (!field.value) {
+                            invalidFields.push(field);
+                        }
+                    });
+
+                    if (invalidFields.length > 0) {
+                        e.preventDefault();
+                        invalidFields[0].focus();
+                        alert('Please fill all required fields for your selected role');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
