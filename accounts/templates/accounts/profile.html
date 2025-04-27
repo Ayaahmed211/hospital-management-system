@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Profile</title>
+  <link rel="stylesheet" href="{% static 'accounts/profile.css' %}">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="assets\images\withoutbackground.png" alt="Logo" style="width: 50px; height: auto; margin:none; padding: none;">
+      </div>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="mainpage">
+    <div class="profile-container">
+    <div class="profile-header">
+      <img src="assets\images\download.jpg" alt="Doctor Photo">
+      <h1>Dr. Jane Doe</h1>
+      <p>MD, Cardiology Specialist</p>
+    </div>
+    <div class="profile-details">
+      <div class="rating">
+        <img src="assets/images/star-svgrepo-com.svg" alt="Star" class="star" data-value="1">
+        <img src="assets/images/star-svgrepo-com.svg" alt="Star" class="star" data-value="2">
+        <img src="assets/images/star-svgrepo-com.svg" alt="Star" class="star" data-value="3">
+        <img src="assets/images/star-svgrepo-com.svg" alt="Star" class="star" data-value="4">
+        <img src="assets/images/star-svgrepo-com.svg" alt="Star" class="star" data-value="5">
+      </div>
+      <div class="sidebarblock"><img src="assets\images\checklist.png" alt="checklist icon" class="sidebaricon"><h2 class="sidebarh2">About</h2></div>
+      <p>Dr. Jane Doe is a highly experienced cardiologist with over 15 years of practice in diagnosing and treating heart-related conditions. She is dedicated to providing personalized care to her patients and staying updated with the latest advancements in cardiology.</p>
+      <hr>
+      <div class="sidebarblock"><img src="assets\images\graduation.png" alt="graduation-cap" class="sidebaricon"><h2 class="sidebarh2">Education</h2></div>
+      <p>Harvard Medical School, MD</p>
+      <p>Stanford University, BSc in Biology</p>
+      <hr>
+      <div class="sidebarblock"><img src="assets\images\suitcase.png" alt="suitcase" class="sidebaricon"><h2 class="sidebarh2">Experience</h2></div>
+      
+      <p>Senior Cardiologist at City Hospital (2010 - Present)</p>
+      <p>Resident Doctor at General Health Clinic (2005 - 2010)</p>
+    </div>
+    <hr>
+    <div class="contact-info">
+      <h2>Contact Information</h2>
+      <p>Email: dr.jane.doe@example.com</p>
+      <p>Phone: (123) 456-7890</p>
+      <p>Office Address: 123 Heart Care Blvd, Suite 100, Metropolis</p>
+    </div>
+  </div>
+<div class="maincontainer">
+  <div class="second-container">
+    <h2>Booking Details</h2>
+      <table>
+        <tr>
+          <th>Fees</th>
+          <th>Follow-up Fees</th>
+        </tr>
+        <tr>
+          <td>E£ 1500</td>
+          <td>E£ 500</td>
+        </tr>
+        <tr>
+    </table>
+  </div>
+  <div class="timetable">
+    <div class="timeslot" id="time1">
+      <h3>Slot 1</h3>
+      <p>From 8am to 9am</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time2">
+      <h3>Slot 2</h3>
+      <p>From 9am to 10am</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time3">
+      <h3>Slot 3</h3>
+      <p>From 10am to 11am</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time4">
+      <h3>Slot 4</h3>
+      <p>From 11am to 12pm</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time5">
+      <h3>Slot 5</h3>
+      <p>From 12pm to 1pm</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time6">
+      <h3>Slot 6</h3>
+      <p>From 1pm to 2pm</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time7">
+      <h3>Slot 7</h3>
+      <p>From 2pm to 3pm</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time8">
+      <h3>Slot 8</h3>
+      <p>From 3pm to 4pm</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+    <div class="timeslot" id="time9">
+      <h3>Slot 9</h3>
+      <p>From 4pm to 5pm</p>
+      <button class="schedule-btn">Schedule</button>
+    </div>
+  </div>
+  </div>
+</div>
+</div>
+</body>
+<script>
+  let ratingFromDatabase = 2;
+
+  const stars = document.querySelectorAll('.star');
+
+  stars.forEach(star => {
+    const value = parseFloat(star.getAttribute('data-value'));
+    if (value <= Math.floor(ratingFromDatabase)) {
+      star.style.filter = 'invert(56%) sepia(100%) saturate(1000%) hue-rotate(10deg) brightness(1.1)';
+    } else if (value - ratingFromDatabase < 1) {
+      star.style.filter = 'grayscale(50%)'; 
+    } else {
+      star.style.filter = 'grayscale(100%)'; 
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+  // Simulate fetching unavailable slots from the database
+  const unavailableSlots = ["time3", "time5", "time7"]; // Example array from the database
+
+  // Disable unavailable slots
+  unavailableSlots.forEach((slotId) => {
+    const slot = document.getElementById(slotId);
+    if (slot) {
+      const button = slot.querySelector(".schedule-btn");
+      button.disabled = true;
+      button.textContent = "Unavailable";
+      button.style.backgroundColor = "#ccc"; // Optional: Change button style
+      button.style.cursor = "not-allowed";
+    }
+  });
+
+  // Add event listeners for available slots
+  const buttons = document.querySelectorAll(".schedule-btn");
+  buttons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      if (!button.disabled) {
+        alert("Appointment scheduled successfully!");
+      }
+    });
+  });
+});
+</script>
+</html>
+
